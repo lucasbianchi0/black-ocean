@@ -50,6 +50,7 @@ export default function Home() {
   const [country, setCountry] = useState('ar')
   const [flagOpen, setFlagOpen] = useState(false)
   const [moFlagOpen, setMoFlagOpen] = useState(false)
+  const [videoControls, setVideoControls] = useState(false)
 
   const lang = countries.find(c => c.code === country)?.lang ?? 'es'
   const T = i18n[lang]
@@ -85,6 +86,11 @@ export default function Home() {
     )
     if (videoEl) videoObs.observe(videoEl)
 
+    const mq = window.matchMedia('(max-width: 768px)')
+    setVideoControls(!mq.matches)
+    const mqHandler = (e) => setVideoControls(!e.matches)
+    mq.addEventListener('change', mqHandler)
+
     const onOutsideClick = (e) => {
       if (!e.target.closest('.flag-wrap')) setFlagOpen(false)
       if (!e.target.closest('.mo-flag-wrap')) setMoFlagOpen(false)
@@ -97,15 +103,24 @@ export default function Home() {
       anchors.forEach(a => a.removeEventListener('click', smoothScroll))
       videoObs.disconnect()
       document.removeEventListener('mousedown', onOutsideClick)
+      mq.removeEventListener('change', mqHandler)
     }
   }, [])
 
   const openMenu = () => {
-    mobileMenuRef.current?.classList.add('open')
+    const menu = mobileMenuRef.current
+    if (!menu) return
+    menu.style.display = 'flex'
+    requestAnimationFrame(() => menu.classList.add('open'))
   }
 
   const closeMenu = () => {
-    mobileMenuRef.current?.classList.remove('open')
+    const menu = mobileMenuRef.current
+    if (!menu) return
+    menu.classList.remove('open')
+    setTimeout(() => {
+      if (menu && !menu.classList.contains('open')) menu.style.display = 'none'
+    }, 420)
   }
 
   const handleMute = () => {
@@ -291,7 +306,7 @@ export default function Home() {
         </div>
         <div className="bv-media reveal d2">
           <div className="bv-video-wrap">
-            <video ref={explainerRef} playsInline muted controls preload="none">
+            <video ref={explainerRef} playsInline muted controls={videoControls} preload="none">
               <source src="/explainer.mp4" type="video/mp4" />
             </video>
             <button ref={muteRef} className="bv-mute" onClick={handleMute}>
