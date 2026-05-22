@@ -111,7 +111,7 @@ export default function Home() {
     const menu = mobileMenuRef.current
     if (!menu) return
     menu.style.display = 'flex'
-    requestAnimationFrame(() => menu.classList.add('open'))
+    requestAnimationFrame(() => requestAnimationFrame(() => menu.classList.add('open')))
   }
 
   const closeMenu = () => {
