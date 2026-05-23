@@ -417,6 +417,67 @@ nav.scrolled {
 
 .mo-ig:hover { color: var(--white); }
 
+/* ─── LOGO TICKER ───────────────────────────────── */
+.logo-ticker {
+  background: var(--black);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 2.8rem 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 14%,
+    black 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 14%,
+    black 86%,
+    transparent 100%
+  );
+}
+
+.lt-track {
+  display: flex;
+  width: max-content;
+  animation: ltScroll 32s linear infinite;
+}
+
+.lt-inner {
+  display: flex;
+  align-items: center;
+  gap: 6rem;
+  padding-right: 6rem;
+  flex-shrink: 0;
+}
+
+.lt-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.45;
+  transition: opacity 0.4s ease;
+  filter: brightness(1.15);
+}
+
+.lt-item:hover { opacity: 0.78; }
+
+.lt-item img {
+  height: 44px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+@keyframes ltScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 /* ─── HERO ──────────────────────────────────────── */
 .hero {
   position: relative;

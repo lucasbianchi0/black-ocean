@@ -282,6 +282,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* LOGO TICKER */}
+      <div className="logo-ticker">
+        <div className="lt-track">
+          {[0, 1].map(copy => (
+            <div className="lt-inner" key={copy} aria-hidden={copy === 1}>
+              {logoList.map((logo, i) => (
+                <div className="lt-item" key={i}>
+                  <img src={logo.src} alt={logo.alt} height={44} width={logo.w} />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* PRESENTACIÓN */}
       <section className="presentacion" id="presentacion">
         <div>
@@ -539,6 +554,15 @@ export default function Home() {
     </>
   )
 }
+
+const logoList = [
+  { src: '/logos/agropharm.png',   alt: 'Agropharm',   w: 48  },
+  { src: '/logos/pilloti.png',     alt: 'Pilloti',      w: 208 },
+  { src: '/logos/wallsecurity.png',alt: 'Wall Security',w: 83  },
+  { src: '/logos/cromed.png',      alt: 'Crosmed',      w: 96  },
+  { src: '/logos/facyca.png',      alt: 'Facyca',       w: 167 },
+  { src: '/logos/puntofarma.png',  alt: 'Punto Farma',  w: 103 },
+]
 
 const areas = [
   { num: '01', name: 'Estrategia y Desarrollo Empresarial', text: 'Diagnóstico, estructuración operativa, expansión y advisory ejecutivo.' },
