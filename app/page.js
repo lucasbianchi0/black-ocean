@@ -15,8 +15,8 @@ const i18n = {
   es: {
     eyebrow: 'Para empresas y ejecutivos en expansión.',
     heroSub: 'Conexiones que generan crecimiento.',
-    heroDescStrong: 'Estructura, especialistas y conexiones estratégicas.',
-    heroDescBody: 'Para compañías que buscan operar, crecer y expandirse en otro nivel.',
+    heroDescStrong: 'Las empresas evolucionan. Su estructura también.',
+    heroDescBody: 'Soluciones estratégicas para compañías que requieren estructura, resolución, capacidad operativa y expansión.',
     ctaPrimary: 'Explorar ecosistema',
     ctaSecondary: 'Nuestra perspectiva',
     contactoBtn: 'Contacto Institucional',
@@ -29,8 +29,8 @@ const i18n = {
   pt: {
     eyebrow: 'Para empresas e executivos em expansão.',
     heroSub: 'Conexões que geram crescimento.',
-    heroDescStrong: 'Estrutura, especialistas e conexões estratégicas.',
-    heroDescBody: 'Para empresas que buscam operar, crescer e expandir em outro nível.',
+    heroDescStrong: 'As empresas evoluem. Sua estrutura também.',
+    heroDescBody: 'Soluções estratégicas para empresas que requerem estrutura, resolução, capacidade operacional e expansão.',
     ctaPrimary: 'Explorar ecossistema',
     ctaSecondary: 'Nossa perspectiva',
     contactoBtn: 'Contato Institucional',
