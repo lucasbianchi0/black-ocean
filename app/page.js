@@ -47,6 +47,7 @@ export default function Home() {
   const mobileMenuRef = useRef(null)
   const explainerRef = useRef(null)
   const muteRef = useRef(null)
+  const heroVideoRef = useRef(null)
   const [country, setCountry] = useState('ar')
   const [flagOpen, setFlagOpen] = useState(false)
   const [moFlagOpen, setMoFlagOpen] = useState(false)
@@ -76,15 +77,32 @@ export default function Home() {
     }
     anchors.forEach(a => a.addEventListener('click', smoothScroll))
 
+    // hero video — explicit play() for Samsung Internet
+    const heroEl = heroVideoRef.current
+    if (heroEl) {
+      heroEl.play().catch(() => {})
+      heroEl.addEventListener('canplay', () => heroEl.play().catch(() => {}), { once: true })
+    }
+
+    // explainer video — intersection-driven play/pause
     const videoEl = explainerRef.current
     const videoObs = new IntersectionObserver(
       (entries) => entries.forEach(e => {
         if (e.isIntersecting) e.target.play().catch(() => {})
         else e.target.pause()
       }),
-      { threshold: 0.25 }
+      { threshold: 0.1 }
     )
     if (videoEl) videoObs.observe(videoEl)
+
+    // touch fallback — first user gesture unlocks autoplay on strict browsers
+    const unlockVideos = () => {
+      heroEl?.play().catch(() => {})
+      document.removeEventListener('touchstart', unlockVideos)
+      document.removeEventListener('pointerdown', unlockVideos)
+    }
+    document.addEventListener('touchstart', unlockVideos, { once: true, passive: true })
+    document.addEventListener('pointerdown', unlockVideos, { once: true, passive: true })
 
     const mq = window.matchMedia('(max-width: 768px)')
     setVideoControls(!mq.matches)
@@ -104,6 +122,8 @@ export default function Home() {
       videoObs.disconnect()
       document.removeEventListener('mousedown', onOutsideClick)
       mq.removeEventListener('change', mqHandler)
+      document.removeEventListener('touchstart', unlockVideos)
+      document.removeEventListener('pointerdown', unlockVideos)
     }
   }, [])
 
@@ -243,7 +263,7 @@ export default function Home() {
       {/* HERO */}
       <section className="hero" id="inicio">
         <div className="hero-video-wrap">
-          <video autoPlay muted loop playsInline preload="none">
+          <video ref={heroVideoRef} autoPlay muted loop playsInline preload="metadata">
             <source src="https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4" type="video/mp4" />
           </video>
         </div>
@@ -283,7 +303,7 @@ export default function Home() {
       </section>
 
       {/* LOGO TICKER */}
-      <div className="logo-ticker">
+      <div className="logo-ticker reveal">
         <div className="lt-track">
           {[0, 1].map(copy => (
             <div className="lt-inner" key={copy} aria-hidden={copy === 1}>
@@ -321,7 +341,7 @@ export default function Home() {
         </div>
         <div className="bv-media reveal d2">
           <div className="bv-video-wrap">
-            <video ref={explainerRef} playsInline muted controls={videoControls} preload="none">
+            <video ref={explainerRef} playsInline muted controls={videoControls} preload="metadata">
               <source src="/explainer.mp4" type="video/mp4" />
             </video>
             <button ref={muteRef} className="bv-mute" onClick={handleMute}>
@@ -397,34 +417,36 @@ export default function Home() {
       </section>
 
       {/* NEGOCIOS EN VIVO — BANNER */}
-      <div className="nev-banner">
-        <div className="nev-glow" />
-        <div className="nev-content">
-          <div className="nev-left">
-            <div className="nev-live-badge">
-              <span className="nev-live-dot" />
-              <span className="nev-live-label">En Vivo</span>
-            </div>
-            <div className="nev-eyebrow">Del ecosistema de Ocean Black &amp; Co.</div>
-            <h3 className="nev-title">Negocios<br />en Vivo</h3>
-            <p className="nev-desc">Tu fuente confiable de noticias económicas, financieras y empresariales para el mercado latinoamericano.</p>
-            <a
-              href="https://negociosenvivo.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nev-cta"
-            >
-              Conocer plataforma <span className="nev-arrow">→</span>
-            </a>
-          </div>
-          <div className="nev-right">
-            <div className="nev-card-wrap">
-              <div className="nev-card">
-                <div className="nev-card-shine" />
-                <img src="/nev-logo.png" alt="Negocios en Vivo" />
+      <div className="nev-section">
+        <div className="nev-container">
+          <div className="nev-card-wrap reveal">
+            <div className="nev-corner-tag">Parte del grupo</div>
+          <div className="nev-card-outer">
+            <div className="nev-glow" />
+            <div className="nev-content">
+              <div className="nev-left">
+                <div className="nev-live-badge reveal d1">
+                  <span className="nev-live-dot" />
+                  <span className="nev-live-label">En Vivo</span>
+                </div>
+                <div className="nev-eyebrow reveal d1">Del ecosistema de Ocean Black &amp; Co.</div>
+                <h3 className="nev-title reveal d2">Negocios<br />en Vivo</h3>
+                <p className="nev-desc reveal d3">Tu fuente confiable de noticias económicas, financieras y empresariales para el mercado latinoamericano.</p>
+                <a href="https://negociosenvivo.com/" target="_blank" rel="noopener noreferrer" className="nev-cta reveal d4">
+                  Conocer plataforma <span className="nev-arrow">→</span>
+                </a>
               </div>
-              <div className="nev-card-shadow" />
+              <div className="nev-right reveal d2">
+                <div className="nev-logo-wrap">
+                  <div className="nev-logo-card">
+                    <div className="nev-logo-shine" />
+                    <img src="/nev-logo.png" alt="Negocios en Vivo" />
+                  </div>
+                  <div className="nev-logo-blur" />
+                </div>
+              </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
@@ -459,12 +481,24 @@ export default function Home() {
         <div className="label reveal" style={{justifyContent:'center'}}>Relaciones Empresariales</div>
         <h2 className="section-title reveal d1">Ecosistema<br />de relaciones.</h2>
         <p className="relaciones-intro reveal d2">Empresas, profesionales y organizaciones que comparten una visión orientada al crecimiento, la evolución y la generación de valor a largo plazo.</p>
-        <div className="logos-row reveal d3">
-          {[...Array(6)].map((_, i) => (
-            <div className="logo-slot" key={i}>
-              <svg width="90" height="24" viewBox="0 0 90 24" fill="none">
-                <rect x="0" y="8" width="90" height="8" rx="1" fill="currentColor" opacity="0.35"/>
-              </svg>
+        <div className="rel-logos-grid reveal d3">
+          {[
+            { src: '/logos-color/agropharm.png',      alt: 'Agropharm'    },
+            { src: '/logos-color/pilloti.png',        alt: 'Pilloti'      },
+            { src: '/logos-color/wallsecurity.png',   alt: 'Wall Security'},
+            { src: '/logos-color/cromed.png',         alt: 'Crosmed'      },
+            { src: '/logos-color/facyca.png',         alt: 'Facyca'       },
+            { src: '/logos-color/puntofarma.png',     alt: 'Punto Farma'  },
+            { src: '/logos-color/bitronics.png',      alt: 'Bitronics'    },
+            { src: '/logos-color/logo-segutrans.png', alt: 'Segutrans'    },
+            { src: '/logos-color/locsys-2.png',       alt: 'Locsys'       },
+            { src: '/logos-color/alfa-team-2.png',    alt: 'Alfa Team'    },
+            { src: '/logos-color/grupo-maipu-2.png',  alt: 'Grupo Maipú'  },
+            { src: '/logos-color/limp.png',           alt: 'Limp'         },
+            { src: '/logos-color/imeco.png',          alt: 'Imeco'        },
+          ].map(({ src, alt }) => (
+            <div className="rel-logo-item" key={alt}>
+              <img src={src} alt={alt} />
             </div>
           ))}
         </div>
@@ -584,6 +618,22 @@ export default function Home() {
           <p className="footer-phrase">Conectar &nbsp;•&nbsp; Resolver &nbsp;•&nbsp; Expandir</p>
         </div>
       </footer>
+
+      {/* WHATSAPP FLOTANTE */}
+      <div className="wa-wrap">
+        <a
+          href="https://wa.me/5491151222161"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="wa-float"
+          aria-label="Contactar por WhatsApp"
+        >
+          <svg className="wa-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          <span className="wa-label">Escribinos</span>
+        </a>
+      </div>
     </>
   )
 }
