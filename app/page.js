@@ -289,7 +289,7 @@ export default function Home() {
             <div className="lt-inner" key={copy} aria-hidden={copy === 1}>
               {logoList.map((logo, i) => (
                 <div className="lt-item" key={i}>
-                  <img src={logo.src} alt={logo.alt} height={44} width={logo.w} />
+                  <img src={logo.src} alt={logo.alt} />
                 </div>
               ))}
             </div>
