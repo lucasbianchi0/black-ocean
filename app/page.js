@@ -52,6 +52,28 @@ export default function Home() {
   const [flagOpen, setFlagOpen] = useState(false)
   const [moFlagOpen, setMoFlagOpen] = useState(false)
   const [videoControls, setVideoControls] = useState(false)
+  const [activeArea, setActiveArea] = useState(null)
+  const [closingModal, setClosingModal] = useState(false)
+  const [activeInsight, setActiveInsight] = useState(null)
+  const [closingInsight, setClosingInsight] = useState(false)
+  const irContentRef = useRef(null)
+
+  const openModal = (area) => setActiveArea(area)
+  const closeModal = () => {
+    setClosingModal(true)
+    setTimeout(() => { setActiveArea(null); setClosingModal(false) }, 360)
+  }
+
+  const openInsight = (i) => setActiveInsight(i)
+  const closeInsight = () => {
+    setClosingInsight(true)
+    setTimeout(() => { setActiveInsight(null); setClosingInsight(false) }, 360)
+  }
+  const navInsight = (i) => {
+    if (i < 0 || i >= insightCards.length) return
+    setActiveInsight(i)
+    if (irContentRef.current) irContentRef.current.scrollTop = 0
+  }
 
   const lang = countries.find(c => c.code === country)?.lang ?? 'es'
   const T = i18n[lang]
@@ -126,6 +148,29 @@ export default function Home() {
       document.removeEventListener('pointerdown', unlockVideos)
     }
   }, [])
+
+  useEffect(() => {
+    document.body.style.overflow = (activeArea || activeInsight !== null) ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [activeArea, activeInsight])
+
+  useEffect(() => {
+    if (!activeArea) return
+    const onKey = (e) => { if (e.key === 'Escape') closeModal() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [activeArea])
+
+  useEffect(() => {
+    if (activeInsight === null) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeInsight()
+      if (e.key === 'ArrowRight') navInsight(activeInsight + 1)
+      if (e.key === 'ArrowLeft') navInsight(activeInsight - 1)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [activeInsight])
 
   const openMenu = () => {
     const menu = mobileMenuRef.current
@@ -363,11 +408,22 @@ export default function Home() {
           </div>
         </div>
         <div className="areas-grid">
-          {areas.map((area, i) => (
-            <div className={`area-card reveal${i % 3 !== 0 ? ` d${i % 3}` : ''}`} key={area.num}>
+          {areaData.map((area, i) => (
+            <div
+              className={`area-card reveal${i % 3 !== 0 ? ` d${i % 3}` : ''}`}
+              key={area.num}
+              onClick={() => openModal(area)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => e.key === 'Enter' && openModal(area)}
+            >
               <div className="area-num">{area.num}</div>
               <div className="area-name">{area.name}</div>
               <div className="area-text">{area.text}</div>
+              <div className="area-card-cta">
+                <span>Ver área</span>
+                <span className="area-card-arrow">→</span>
+              </div>
             </div>
           ))}
         </div>
@@ -485,17 +541,18 @@ export default function Home() {
           {[
             { src: '/logos-color/agropharm.png',      alt: 'Agropharm'    },
             { src: '/logos-color/pilloti.png',        alt: 'Pilloti'      },
-            { src: '/logos-color/wallsecurity.png',   alt: 'Wall Security'},
             { src: '/logos-color/cromed.png',         alt: 'Crosmed'      },
-            { src: '/logos-color/facyca.png',         alt: 'Facyca'       },
             { src: '/logos-color/puntofarma.png',     alt: 'Punto Farma'  },
             { src: '/logos-color/bitronics.png',      alt: 'Bitronics'    },
             { src: '/logos-color/logo-segutrans.png', alt: 'Segutrans'    },
             { src: '/logos-color/locsys-2.png',       alt: 'Locsys'       },
             { src: '/logos-color/alfa-team-2.png',    alt: 'Alfa Team'    },
-            { src: '/logos-color/grupo-maipu-2.png',  alt: 'Grupo Maipú'  },
             { src: '/logos-color/limp.png',           alt: 'Limp'         },
-            { src: '/logos-color/imeco.png',          alt: 'Imeco'        },
+            { src: '/logos-color/saintcobain.png',    alt: 'Saint-Gobain' },
+            { src: '/logos-color/loginter.png',       alt: 'Loginter'     },
+            { src: '/logos-color/forever-pipe.png',   alt: 'Forever Pipe' },
+            { src: '/logos-color/cactus.png',         alt: 'Cactus'       },
+            { src: '/logos-color/localiza.png',       alt: 'Localiza'     },
           ].map(({ src, alt }) => (
             <div className="rel-logo-item" key={alt}>
               <img src={src} alt={alt} />
@@ -511,11 +568,18 @@ export default function Home() {
             <div className="label reveal">Insights</div>
             <h2 className="section-title reveal d1">Perspectiva<br />empresarial.</h2>
           </div>
-          <a href="#" className="link-underline reveal d2">Ver todos</a>
+          <button className="link-underline reveal d2" onClick={() => openInsight(0)}>Ver todos</button>
         </div>
         <div className="insights-grid">
           {insightCards.map((card, i) => (
-            <div className={`insight-card reveal${i > 0 ? ` d${i}` : ''}`} key={card.title}>
+            <div
+              className={`insight-card reveal${i > 0 ? ` d${i}` : ''}`}
+              key={card.title}
+              onClick={() => openInsight(i)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => e.key === 'Enter' && openInsight(i)}
+            >
               <div className="insight-cat">{card.cat}</div>
               <div className="insight-title">{card.title}</div>
               <div className="insight-text">{card.text}</div>
@@ -534,7 +598,15 @@ export default function Home() {
           <div className="contact-details reveal d3">
             <div className="contact-row">
               <span className="contact-label">Email</span>
-              <a href="mailto:contacto@oceanblack.co" className="contact-value">contacto@oceanblack.co</a>
+              <a href="mailto:contacto@oceanblack.com.ar" className="contact-value">contacto@oceanblack.com.ar</a>
+            </div>
+            <div className="contact-row">
+              <span className="contact-label">Javier Cicero</span>
+              <a href="mailto:javiercicero@oceanblack.com.ar" className="contact-value">javiercicero@oceanblack.com.ar</a>
+            </div>
+            <div className="contact-row">
+              <span className="contact-label">Tomás Vera</span>
+              <a href="mailto:tomasvera@oceanblack.com.ar" className="contact-value">tomasvera@oceanblack.com.ar</a>
             </div>
             <div className="contact-row">
               <span className="contact-label">Instagram</span>
@@ -608,7 +680,9 @@ export default function Home() {
           <div className="footer-col">
             <h5>Contacto</h5>
             <ul>
-              <li><a href="#contacto">Contacto Institucional</a></li>
+              <li><a href="mailto:contacto@oceanblack.com.ar">contacto@oceanblack.com.ar</a></li>
+              <li><a href="mailto:javiercicero@oceanblack.com.ar">javiercicero@oceanblack.com.ar</a></li>
+              <li><a href="mailto:tomasvera@oceanblack.com.ar">tomasvera@oceanblack.com.ar</a></li>
               <li><a href="https://instagram.com/oceanblack.co" target="_blank" rel="noopener">Instagram</a></li>
             </ul>
           </div>
@@ -618,6 +692,129 @@ export default function Home() {
           <p className="footer-phrase">Conectar &nbsp;•&nbsp; Resolver &nbsp;•&nbsp; Expandir</p>
         </div>
       </footer>
+
+      {/* AREA MODAL */}
+      {activeArea && (
+        <div
+          className={`am-overlay${closingModal ? ' am-closing' : ''}`}
+          onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className={`am-panel${closingModal ? ' am-closing' : ''}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <button className="am-close" onClick={closeModal} aria-label="Cerrar">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              </svg>
+            </button>
+            <div className="am-body">
+              <div className="am-left">
+                <div className="am-num-label">Área {activeArea.num}</div>
+                <h2 className="am-title">{activeArea.name}</h2>
+                <p className="am-desc">{activeArea.text}</p>
+                <div className="am-services-label">Servicios</div>
+                <ul className="am-services">
+                  {activeArea.services.map((s, i) => (
+                    <li key={s} style={{ '--i': i }}>{s}</li>
+                  ))}
+                </ul>
+                <a
+                  href={`https://wa.me/5491151222161?text=${encodeURIComponent(`Hola, me interesa el área de ${activeArea.name}.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="am-cta"
+                >
+                  <span>Hablemos</span>
+                  <span className="am-cta-arrow">→</span>
+                </a>
+              </div>
+              <div className="am-right" aria-hidden="true">
+                <img className="am-right-img" src={activeArea.img} alt="" />
+                <div className="am-right-overlay" />
+                <div className="am-right-num">{activeArea.num}</div>
+                <div className="am-right-dot" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* INSIGHT READER */}
+      {activeInsight !== null && (
+        <div
+          className={`ir-overlay${closingInsight ? ' ir-closing' : ''}`}
+          onClick={closeInsight}
+        >
+          <div
+            className={`ir-panel${closingInsight ? ' ir-closing' : ''}`}
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="ir-header">
+              <div className="ir-pills">
+                {insightCards.map((c, i) => (
+                  <button
+                    key={i}
+                    className={`ir-pill${i === activeInsight ? ' active' : ''}`}
+                    onClick={() => navInsight(i)}
+                  >{c.cat}</button>
+                ))}
+              </div>
+              <button className="ir-close" onClick={closeInsight} aria-label="Cerrar">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <div className="ir-content" ref={irContentRef}>
+              <div className="ir-article" key={activeInsight}>
+                <div className="ir-cat">{insightCards[activeInsight].cat}</div>
+                <h2 className="ir-title">{insightCards[activeInsight].title}</h2>
+                <div className="ir-divider" />
+                <div className="ir-body">
+                  {insightCards[activeInsight].body.map((block, i) => {
+                    if (block.type === 'p')    return <p key={i}>{block.text}</p>
+                    if (block.type === 'lead') return <p key={i} className="ir-lead">{block.text}</p>
+                    if (block.type === 'quote') return <blockquote key={i}>{block.text}</blockquote>
+                    if (block.type === 'ul')  return (
+                      <ul key={i}>
+                        {block.items.map(item => <li key={item}>{item}</li>)}
+                      </ul>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="ir-footer">
+              <button
+                className="ir-nav-btn"
+                onClick={() => navInsight(activeInsight - 1)}
+                disabled={activeInsight === 0}
+              >← Anterior</button>
+              <div className="ir-dots">
+                {insightCards.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`ir-dot${i === activeInsight ? ' active' : ''}`}
+                    onClick={() => navInsight(i)}
+                  />
+                ))}
+              </div>
+              <button
+                className="ir-nav-btn"
+                onClick={() => navInsight(activeInsight + 1)}
+                disabled={activeInsight === insightCards.length - 1}
+              >Siguiente →</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* WHATSAPP FLOTANTE */}
       <div className="wa-wrap">
@@ -639,31 +836,69 @@ export default function Home() {
 }
 
 const logoList = [
-  { src: '/logos/agropharm.png',      alt: 'Agropharm',    w: 48  },
-  { src: '/logos/pilloti.png',        alt: 'Pilloti',      w: 208 },
-  { src: '/logos/wallsecurity.png',   alt: 'Wall Security',w: 83  },
-  { src: '/logos/cromed.png',         alt: 'Crosmed',      w: 96  },
-  { src: '/logos/facyca.png',         alt: 'Facyca',       w: 167 },
-  { src: '/logos/puntofarma.png',     alt: 'Punto Farma',  w: 103 },
-  { src: '/logos/bitronics.png',      alt: 'Bitronics',    w: 75  },
-  { src: '/logos/logo-segutrans.png', alt: 'Segutrans',    w: 116 },
-  { src: '/logos/locsys-2.png',       alt: 'Locsys',       w: 75  },
-  { src: '/logos/alfa-team-2.png',    alt: 'Alfa Team',    w: 75  },
-  { src: '/logos/grupo-maipu-2.png',  alt: 'Grupo Maipú',  w: 75  },
-  { src: '/logos/limp.png',           alt: 'Limp',         w: 48  },
-  { src: '/logos/imeco.png',          alt: 'Imeco',        w: 261 },
+  { src: '/logos/facyca.png',        alt: 'Facyca'       },
+  { src: '/logos/brinks.png',        alt: 'Brinks'       },
+  { src: '/logos/saintcobain.png',   alt: 'Saint-Gobain' },
+  { src: '/logos/wallsecurity.png',  alt: 'Wall Security'},
+  { src: '/logos/pilloti.png',       alt: 'Pilloti'      },
+  { src: '/logos/grupo-maipu-2.png', alt: 'Grupo Maipú'  },
+  { src: '/logos/molinos.png',       alt: 'Molinos'      },
+  { src: '/logos/loginter.png',      alt: 'Loginter'     },
+  { src: '/logos/imeco.png',         alt: 'Imeco'        },
+  { src: '/logos/agropharm.png',     alt: 'Agropharm'    },
 ]
 
-const areas = [
-  { num: '01', name: 'Estrategia y Desarrollo Empresarial', text: 'Diagnóstico, estructuración operativa, expansión y advisory ejecutivo.' },
-  { num: '02', name: 'Contable, Fiscal y Administrativa', text: 'Planificación fiscal, optimización tributaria y gestión contable integral.' },
-  { num: '03', name: 'Soluciones Financieras y Corporativas', text: 'Financiamiento, estructuras de capital y articulación con operadores especializados.' },
-  { num: '04', name: 'Jurídica y Corporativa', text: 'Derecho societario, contratos, estructuración corporativa y compliance.' },
-  { num: '05', name: 'Real Estate y Desarrollo Inmobiliario', text: 'Inversiones, estructuración patrimonial y activos estratégicos.' },
-  { num: '06', name: 'Recursos Humanos y Desarrollo Organizacional', text: 'Reclutamiento ejecutivo, cultura organizacional y optimización de equipos.' },
-  { num: '07', name: 'Tecnología, IA y Automatización', text: 'Automatización, inteligencia artificial aplicada y ecosistemas digitales.' },
-  { num: '08', name: 'Seguridad y Protección Empresarial', text: 'Gestión de riesgo corporativo, protocolos internos y seguridad operativa.' },
-  { num: '09 — 10', name: 'Desarrollo Comercial, Marketing y Formación', text: 'Posicionamiento, branding, automatización comercial y formación de equipos.' },
+const areaData = [
+  {
+    num: '01', img: '/areas/01.jpg', name: 'Estrategia y Desarrollo Empresarial',
+    text: 'Acompañamos empresas y ejecutivos en procesos de análisis, crecimiento y estructuración estratégica.',
+    services: ['Diagnóstico empresarial','Desarrollo de estructura operativa','Estrategias de expansión','Optimización de procesos','Reorganización empresarial','Desarrollo comercial','Networking estratégico','Estructuración de alianzas','Advisory ejecutivo'],
+  },
+  {
+    num: '02', img: '/areas/02.jpg', name: 'Área Contable, Fiscal y Administrativa',
+    text: 'Articulamos soluciones contables y administrativas orientadas a mejorar la organización y eficiencia operativa.',
+    services: ['Gestión contable integral','Liquidación impositiva','Planificación fiscal','Estructuración administrativa','Optimización tributaria','Análisis financiero','Auditoría administrativa','Monotributo y autónomos','Sueldos y cargas sociales','Reportes de gestión'],
+  },
+  {
+    num: '03', img: '/areas/03.jpg', name: 'Soluciones Financieras y Corporativas',
+    text: 'Desarrollamos acceso a herramientas financieras y estructuras orientadas a facilitar el crecimiento empresarial.',
+    services: ['Gestión de líneas de crédito','Alternativas de financiamiento','Desarrollo de estructuras financieras','Capital para expansión','Soluciones corporativas estratégicas','Vehículos de optimización empresarial','Estructuración patrimonial','Evaluación de proyectos','Articulación con operadores y entidades'],
+  },
+  {
+    num: '04', img: '/areas/04.jpg', name: 'Área Jurídica y Corporativa',
+    text: 'Coordinamos soluciones legales y corporativas mediante estudios y profesionales especializados.',
+    services: ['Derecho societario','Constitución de sociedades','Contratos comerciales','Estructuración corporativa','Acuerdos empresariales','Protección patrimonial','Asesoramiento laboral','Gestión societaria','Marcas y registros','Compliance corporativo'],
+  },
+  {
+    num: '05', img: '/areas/05.jpg', name: 'Real Estate y Desarrollo Inmobiliario',
+    text: 'Acompañamos operaciones y estructuras vinculadas al desarrollo inmobiliario y patrimonial.',
+    services: ['Búsqueda de oportunidades','Inversiones inmobiliarias','Real estate corporativo','Estructuración patrimonial','Operaciones comerciales','Networking inmobiliario','Gestión de activos'],
+  },
+  {
+    num: '06', img: '/areas/06.jpg', name: 'Recursos Humanos y Desarrollo Organizacional',
+    text: 'Brindamos herramientas orientadas al fortalecimiento de equipos y estructuras internas.',
+    services: ['Reclutamiento estratégico','Búsqueda ejecutiva','Desarrollo organizacional','Estructura de equipos','Procesos internos','Capacitación empresarial','Cultura organizacional','Optimización operativa'],
+  },
+  {
+    num: '07', img: '/areas/07.jpg', name: 'Tecnología, IA y Automatización',
+    text: 'Implementamos soluciones tecnológicas orientadas a mejorar eficiencia, control y escalabilidad empresarial.',
+    services: ['Automatización de procesos','Inteligencia artificial aplicada','Integración de sistemas','CRM y gestión operativa','Asistentes virtuales empresariales','Automatización comercial','Dashboards y control','Optimización digital','Desarrollo de ecosistemas tecnológicos'],
+  },
+  {
+    num: '08', img: '/areas/08.jpg', name: 'Seguridad y Protección Empresarial',
+    text: 'Desarrollamos soluciones vinculadas a prevención, control y resguardo operativo.',
+    services: ['Seguridad corporativa','Evaluación operativa','Protocolos internos','Seguridad tecnológica','Supervisión estratégica','Control de procesos sensibles'],
+  },
+  {
+    num: '09', img: '/areas/09.jpg', name: 'Desarrollo Comercial, Marketing y Expansión',
+    text: 'Estrategias orientadas al posicionamiento, crecimiento comercial y fortalecimiento operativo de empresas y marcas.',
+    services: ['Estrategias de crecimiento','Expansión comercial','Estructuración de áreas de ventas','Posicionamiento empresarial','Branding corporativo','Comunicación institucional','Estrategias digitales','CRM y seguimiento de clientes','Automatización de procesos comerciales','Embudos y gestión comercial','Sitios web corporativos','Ecosistemas digitales'],
+  },
+  {
+    num: '10', img: '/areas/10.jpg', name: 'Formación Comercial y Desarrollo de Equipos',
+    text: 'Programas orientados al fortalecimiento comercial, profesionalización de equipos y optimización de procesos de ventas.',
+    services: ['Entrenamiento de equipos comerciales','Desarrollo de procesos de ventas','Estructuración de áreas comerciales','Capacitación en negociación y cierre','Optimización de atención y seguimiento','Formación en ventas consultivas','Integración de herramientas digitales','IA aplicada a procesos comerciales','Desarrollo de liderazgo comercial','Workshops y programas internos'],
+  },
 ]
 
 const modeloItems = [
@@ -674,7 +909,43 @@ const modeloItems = [
 ]
 
 const insightCards = [
-  { cat: 'Estrategia', title: 'Estructuras flexibles para entornos en transformación', text: 'Las organizaciones que se adaptan con velocidad son las que ganan. La estructura es la ventaja competitiva invisible.' },
-  { cat: 'Tecnología & IA', title: 'Automatización: la nueva base de operación corporativa', text: 'La inteligencia artificial aplicada ya no es una tendencia. Es el estándar de las empresas que buscan escalar.' },
-  { cat: 'Expansión', title: 'El capital estratégico detrás del crecimiento sostenible', text: 'Crecer requiere más que financiamiento. Requiere acceso, conexiones y una estructura que soporte la expansión.' },
+  {
+    cat: 'Estrategia',
+    title: 'Estructuras flexibles para entornos en transformación',
+    text: 'Las organizaciones que se adaptan con velocidad son las que ganan. La estructura es la ventaja competitiva invisible.',
+    body: [
+      { type: 'p', text: 'Las compañías atraviesan escenarios cada vez más dinámicos, donde la capacidad de adaptación dejó de ser una ventaja secundaria para convertirse en un factor central de competitividad.' },
+      { type: 'p', text: 'En OCEAN BLACK & CO. trabajamos sobre la estructura estratégica de empresas y organizaciones que necesitan optimizar procesos, redefinir modelos operativos y fortalecer su capacidad de respuesta frente a nuevos desafíos.' },
+      { type: 'p', text: 'Nuestro enfoque combina análisis, visión empresarial y coordinación interdisciplinaria para desarrollar soluciones alineadas a las necesidades reales de cada operación.' },
+      { type: 'lead', text: 'Acompañamos procesos vinculados a:' },
+      { type: 'ul', items: ['Reorganización operativa', 'Optimización interna', 'Desarrollo comercial', 'Estructura corporativa', 'Expansión de unidades de negocio', 'Fortalecimiento estratégico'] },
+      { type: 'p', text: 'Entendemos que detrás de cada etapa de crecimiento existe una necesidad estructural distinta. La velocidad sin estructura genera desgaste. La estructura permite sostener evolución, eficiencia y escalabilidad.' },
+    ],
+  },
+  {
+    cat: 'Tecnología & IA',
+    title: 'Automatización: la nueva base de operación corporativa',
+    text: 'La inteligencia artificial aplicada ya no es una tendencia. Es el estándar de las empresas que buscan escalar.',
+    body: [
+      { type: 'p', text: 'La transformación tecnológica ya no pertenece únicamente a grandes corporaciones. Hoy, las organizaciones más competitivas son aquellas capaces de integrar automatización, inteligencia artificial y sistemas inteligentes dentro de sus operaciones cotidianas.' },
+      { type: 'p', text: 'En OCEAN BLACK & CO. impulsamos soluciones orientadas a optimizar tiempos, reducir fricción operativa y mejorar la capacidad de gestión mediante herramientas tecnológicas adaptadas a cada estructura empresarial.' },
+      { type: 'lead', text: 'Trabajamos sobre:' },
+      { type: 'ul', items: ['Automatización de procesos', 'Integración de sistemas', 'Inteligencia artificial aplicada', 'Optimización administrativa', 'Desarrollo de herramientas digitales', 'Modernización operativa'] },
+      { type: 'quote', text: 'La tecnología no reemplaza estructuras. Las potencia.' },
+      { type: 'p', text: 'La incorporación estratégica de automatización permite a las empresas operar con mayor precisión, velocidad y capacidad de expansión, liberando tiempo y recursos para enfocarse en decisiones de alto valor.' },
+    ],
+  },
+  {
+    cat: 'Expansión',
+    title: 'El capital estratégico detrás del crecimiento sostenible',
+    text: 'Crecer requiere más que financiamiento. Requiere acceso, conexiones y una estructura que soporte la expansión.',
+    body: [
+      { type: 'p', text: 'Expandirse implica mucho más que aumentar volumen o incorporar recursos. El crecimiento sostenible requiere estructura, visión, acceso estratégico y capacidad de ejecución.' },
+      { type: 'p', text: 'En OCEAN BLACK & CO. acompañamos empresas y organizaciones que buscan fortalecer sus procesos de expansión mediante conexiones, herramientas y soluciones alineadas a objetivos concretos de desarrollo.' },
+      { type: 'lead', text: 'Nuestro ecosistema integra distintas áreas para facilitar:' },
+      { type: 'ul', items: ['Crecimiento comercial', 'Desarrollo corporativo', 'Generación de alianzas', 'Acceso a nuevas oportunidades', 'Optimización de estructura', 'Acompañamiento en procesos de escalabilidad'] },
+      { type: 'p', text: 'Creemos que las empresas crecen de forma más sólida cuando cuentan con una estructura preparada para sostener esa evolución.' },
+      { type: 'quote', text: 'El verdadero crecimiento no depende únicamente del capital disponible, sino de la capacidad de transformar oportunidades en expansión real.' },
+    ],
+  },
 ]
