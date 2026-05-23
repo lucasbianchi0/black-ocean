@@ -556,12 +556,19 @@ export default function Home() {
 }
 
 const logoList = [
-  { src: '/logos/agropharm.png',   alt: 'Agropharm',   w: 48  },
-  { src: '/logos/pilloti.png',     alt: 'Pilloti',      w: 208 },
-  { src: '/logos/wallsecurity.png',alt: 'Wall Security',w: 83  },
-  { src: '/logos/cromed.png',      alt: 'Crosmed',      w: 96  },
-  { src: '/logos/facyca.png',      alt: 'Facyca',       w: 167 },
-  { src: '/logos/puntofarma.png',  alt: 'Punto Farma',  w: 103 },
+  { src: '/logos/agropharm.png',      alt: 'Agropharm',    w: 48  },
+  { src: '/logos/pilloti.png',        alt: 'Pilloti',      w: 208 },
+  { src: '/logos/wallsecurity.png',   alt: 'Wall Security',w: 83  },
+  { src: '/logos/cromed.png',         alt: 'Crosmed',      w: 96  },
+  { src: '/logos/facyca.png',         alt: 'Facyca',       w: 167 },
+  { src: '/logos/puntofarma.png',     alt: 'Punto Farma',  w: 103 },
+  { src: '/logos/bitronics.png',      alt: 'Bitronics',    w: 75  },
+  { src: '/logos/logo-segutrans.png', alt: 'Segutrans',    w: 116 },
+  { src: '/logos/locsys-2.png',       alt: 'Locsys',       w: 75  },
+  { src: '/logos/alfa-team-2.png',    alt: 'Alfa Team',    w: 75  },
+  { src: '/logos/grupo-maipu-2.png',  alt: 'Grupo Maipú',  w: 75  },
+  { src: '/logos/limp.png',           alt: 'Limp',         w: 48  },
+  { src: '/logos/imeco.png',          alt: 'Imeco',        w: 261 },
 ]
 
 const areas = [
