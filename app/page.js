@@ -396,6 +396,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* NEGOCIOS EN VIVO — BANNER */}
+      <div className="nev-banner">
+        <div className="nev-left">
+          <span className="nev-eyebrow">Del ecosistema de Ocean Black &amp; Co.</span>
+          <div className="nev-brand">Negocios<br />en Vivo</div>
+          <p className="nev-desc">Tu fuente confiable de noticias económicas, financieras y empresariales para el mercado latinoamericano.</p>
+        </div>
+        <div className="nev-right">
+          <a
+            href="https://negociosenvivo.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="nev-cta"
+          >
+            <span>Conocer plataforma</span>
+            <span className="nev-arrow">→</span>
+          </a>
+        </div>
+      </div>
+
       {/* MODELO OPERATIVO */}
       <section className="modelo" id="modelo">
         <div>

@@ -1064,6 +1064,125 @@ section { padding: 9rem 5rem; }
 
 .pillar-sub { font-size: 0.72rem; color: var(--gray-2); letter-spacing: 0.06em; }
 
+/* ─── NEGOCIOS EN VIVO BANNER ───────────────────── */
+.nev-banner {
+  background: var(--dark-2);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.nev-banner::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+}
+
+.nev-banner::after {
+  content: 'NEV';
+  position: absolute;
+  font-family: var(--font-serif);
+  font-size: 18vw;
+  font-weight: 300;
+  color: rgba(255,255,255,0.018);
+  right: -2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+.nev-left { max-width: 520px; position: relative; z-index: 1; }
+
+.nev-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 0.48rem;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.8rem;
+}
+
+.nev-eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.nev-brand {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 4.5vw, 4.5rem);
+  font-weight: 300;
+  line-height: 1.04;
+  color: var(--white);
+  letter-spacing: -0.01em;
+  margin-bottom: 1.8rem;
+}
+
+.nev-desc {
+  font-size: 0.84rem;
+  color: var(--gray-2);
+  line-height: 1.95;
+  max-width: 400px;
+}
+
+.nev-right {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.nev-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2rem;
+  font-size: 0.58rem;
+  font-family: var(--font-sans);
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--white);
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 1.1rem 2.4rem;
+  transition: background 0.35s, border-color 0.35s, gap 0.35s;
+  white-space: nowrap;
+}
+
+.nev-cta:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.35);
+  gap: 1.8rem;
+}
+
+.nev-arrow {
+  font-size: 1rem;
+  transition: transform 0.35s;
+  line-height: 1;
+}
+
+.nev-cta:hover .nev-arrow { transform: translateX(4px); }
+
+@media (max-width: 768px) {
+  .nev-banner { flex-direction: column; align-items: flex-start; gap: 2.5rem; padding: 4rem 1.8rem; }
+  .nev-brand { font-size: clamp(2.4rem, 9vw, 3.5rem); }
+}
+
 /* ─── MODELO OPERATIVO ──────────────────────────── */
 .modelo {
   background: var(--black);
