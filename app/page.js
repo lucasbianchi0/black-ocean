@@ -13,7 +13,7 @@ const countries = [
 
 const i18n = {
   es: {
-    eyebrow: 'Para empresas y ejecutivos en expansión.',
+    eyebrow: 'Conectar · Resolver · Expandir',
     heroSub: 'Conexiones que generan crecimiento.',
     heroDescStrong: 'Las empresas evolucionan. Su estructura también.',
     heroDescBody: 'Soluciones estratégicas para compañías que requieren estructura, resolución, capacidad operativa y expansión.',
@@ -27,7 +27,7 @@ const i18n = {
     bvLink: 'Iniciar conversación',
   },
   pt: {
-    eyebrow: 'Para empresas e executivos em expansão.',
+    eyebrow: 'Conectar · Resolver · Expandir',
     heroSub: 'Conexões que geram crescimento.',
     heroDescStrong: 'As empresas evoluem. Sua estrutura também.',
     heroDescBody: 'Soluções estratégicas para empresas que requerem estrutura, resolução, capacidade operacional e expansão.',
