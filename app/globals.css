@@ -440,6 +440,18 @@ nav.scrolled {
   );
 }
 
+@media (max-width: 768px) {
+  .logo-ticker {
+    -webkit-mask-image: none;
+    mask-image: none;
+    padding: 2rem 0;
+  }
+  .lt-inner { gap: 3rem; padding-right: 3rem; }
+  .lt-item { padding: 0 12px; }
+  .lt-item img { height: 38px; }
+  .lt-track { animation-duration: 22s; }
+}
+
 .lt-track {
   display: flex;
   width: max-content;
@@ -1874,7 +1886,6 @@ footer {
   .hero-cta-wrap { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
   .wa-wrap { bottom: 1.6rem; right: 1.6rem; }
   .wa-float { width: 56px; height: 56px; padding: 0 1.1rem; }
-  .wa-float:hover { width: 56px; animation: waFloat 4.5s ease-in-out infinite; transform: none; }
   .wa-label { display: none; }
 }
 
@@ -2441,16 +2452,6 @@ footer {
   50%       { transform: translateY(-7px); }
 }
 
-.wa-float:hover {
-  width: 192px;
-  box-shadow:
-    0 4px 16px rgba(0,0,0,0.55),
-    0 14px 40px rgba(0,0,0,0.5),
-    0 0 50px rgba(37,211,102,0.14);
-  animation: none;
-  transform: translateY(-4px);
-}
-
 .wa-icon {
   width: 25px;
   height: 25px;
@@ -2459,10 +2460,6 @@ footer {
   z-index: 2;
   color: rgba(240,236,230,0.88);
   transition: color 0.4s ease;
-}
-
-.wa-float:hover .wa-icon {
-  color: #25d366;
 }
 
 .wa-label {
@@ -2479,6 +2476,16 @@ footer {
   transition: opacity 0.28s 0.18s ease;
 }
 
-.wa-float:hover .wa-label {
-  opacity: 1;
+@media (hover: hover) {
+  .wa-float:hover {
+    width: 192px;
+    box-shadow:
+      0 4px 16px rgba(0,0,0,0.55),
+      0 14px 40px rgba(0,0,0,0.5),
+      0 0 50px rgba(37,211,102,0.14);
+    animation: none;
+    transform: translateY(-4px);
+  }
+  .wa-float:hover .wa-icon { color: #25d366; }
+  .wa-float:hover .wa-label { opacity: 1; }
 }
