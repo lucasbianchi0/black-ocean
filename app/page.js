@@ -398,21 +398,34 @@ export default function Home() {
 
       {/* NEGOCIOS EN VIVO — BANNER */}
       <div className="nev-banner">
-        <div className="nev-left">
-          <span className="nev-eyebrow">Del ecosistema de Ocean Black &amp; Co.</span>
-          <div className="nev-brand">Negocios<br />en Vivo</div>
-          <p className="nev-desc">Tu fuente confiable de noticias económicas, financieras y empresariales para el mercado latinoamericano.</p>
-        </div>
-        <div className="nev-right">
-          <a
-            href="https://negociosenvivo.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nev-cta"
-          >
-            <span>Conocer plataforma</span>
-            <span className="nev-arrow">→</span>
-          </a>
+        <div className="nev-glow" />
+        <div className="nev-content">
+          <div className="nev-left">
+            <div className="nev-live-badge">
+              <span className="nev-live-dot" />
+              <span className="nev-live-label">En Vivo</span>
+            </div>
+            <div className="nev-eyebrow">Del ecosistema de Ocean Black &amp; Co.</div>
+            <h3 className="nev-title">Negocios<br />en Vivo</h3>
+            <p className="nev-desc">Tu fuente confiable de noticias económicas, financieras y empresariales para el mercado latinoamericano.</p>
+            <a
+              href="https://negociosenvivo.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nev-cta"
+            >
+              Conocer plataforma <span className="nev-arrow">→</span>
+            </a>
+          </div>
+          <div className="nev-right">
+            <div className="nev-card-wrap">
+              <div className="nev-card">
+                <div className="nev-card-shine" />
+                <img src="/nev-logo.png" alt="Negocios en Vivo" />
+              </div>
+              <div className="nev-card-shadow" />
+            </div>
+          </div>
         </div>
       </div>
 
