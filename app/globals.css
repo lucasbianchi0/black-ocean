@@ -83,6 +83,7 @@ nav.scrolled {
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--white);
+  white-space: nowrap;
 }
 
 .nav-logo-text em {
@@ -103,6 +104,7 @@ nav.scrolled {
   color: var(--gray-2);
   text-decoration: none;
   transition: color 0.3s;
+  white-space: nowrap;
 }
 
 .nav-center a:hover { color: var(--white); }
@@ -497,7 +499,7 @@ nav.scrolled {
 .hero {
   position: relative;
   height: 100vh;
-  min-height: 700px;
+  min-height: 800px;
   display: flex;
   align-items: flex-end;
   padding: 5rem 5rem 7rem;
@@ -1837,6 +1839,22 @@ footer {
 .d6 { transition-delay: 0.72s; }
 
 /* ─── RESPONSIVE ────────────────────────────────── */
+
+/* 1280px — nav pierde el botón de contacto; hero comprime márgenes */
+@media (max-width: 1280px) {
+  .btn-ghost { display: none; }
+  .hero-eyebrow  { margin-bottom: 1.4rem; }
+  .hero-title    { margin-bottom: 1.4rem; }
+  .hero-sub      { margin-bottom: 1rem; }
+  .hero-descriptor { padding-top: 1rem; margin-bottom: 1.4rem; }
+}
+
+/* 1024px — hamburger en tablets/desktop chico */
+@media (max-width: 1024px) {
+  .nav-center, .flag-wrap { display: none; }
+  .hamburger { display: flex; }
+}
+
 @media (max-width: 1100px) {
   nav { padding: 1.8rem 3rem; }
   nav.scrolled { padding: 1.2rem 3rem; }
@@ -1844,6 +1862,8 @@ footer {
   .hero { padding: 4.5rem 3rem 6rem; }
   .hero-scroll-indicator { right: 3rem; }
   .hero-areas { right: 3rem; }
+  .hero-title { font-size: clamp(2.8rem, 5.5vw, 5.5rem); }
+  .hero-descriptor { font-size: 0.88rem; }
   .presentacion, .modelo, .contacto { grid-template-columns: 1fr; gap: 4rem; }
   .bv-text { padding: 7rem 3rem; }
   .bv-media { padding: 0; }
@@ -1862,8 +1882,6 @@ footer {
 @media (max-width: 768px) {
   nav { padding: 1.2rem 1.8rem; }
   nav.scrolled { padding: 0.9rem 1.8rem; }
-  .nav-center, .btn-ghost, .flag-wrap { display: none; }
-  .hamburger { display: flex; }
   section { padding: 5rem 1.8rem; }
   .hero { padding: 4rem 1.8rem 5rem; min-height: 100svh; align-items: flex-end; }
   .hero-scroll-indicator { display: none; }

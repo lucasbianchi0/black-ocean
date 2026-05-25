@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#080808"/>
+  <defs>
+    <radialGradient id="rg" cx="35%" cy="28%" r="70%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#dddddd"/>
+      <stop offset="100%" stop-color="#999999"/>
+    </radialGradient>
+  </defs>
+  <!-- Gap at 130° SVG (≈ 7-8 o'clock). Center=(50,42), outer r=36 -->
+  <!-- Gap: 123° to 138°  (15° wide) -->
+  <!-- Start of ring (at 138°): x=50+36*cos(138°)=50-26.8=23.2, y=42+36*sin(138°)=42+24.1=66.1 -->
+  <!-- End of ring (at 123°):   x=50+36*cos(123°)=50-19.6=30.4, y=42+36*sin(123°)=42+30.2=72.2 -->
+  <path d="M 23.2 66.1 A 36 36 0 1 1 30.4 72.2"
+        fill="none" stroke="url(#rg)" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- Inner ring: r=22, same gap -->
+  <!-- Start (138°): x=50+22*cos(138°)=50-16.3=33.7, y=42+22*sin(138°)=42+14.7=56.7 -->
+  <!-- End (123°):   x=50+22*cos(123°)=50-12.0=38.0, y=42+22*sin(123°)=42+18.4=60.4 -->
+  <path d="M 33.7 56.7 A 22 22 0 1 1 38.0 60.4"
+        fill="none" stroke="url(#rg)" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Tail: from gap, curves outward-left then sweeps right -->
+  <path d="M 25 69 C 10 76 20 90 52 82"
+        fill="none" stroke="url(#rg)" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { translations, getAreaData, getModeloItems, getInsightCards } from './i18n'
 
@@ -17,7 +17,6 @@ export default function Home() {
   const navRef = useRef(null)
   const mobileMenuRef = useRef(null)
   const explainerRef = useRef(null)
-  const muteRef = useRef(null)
   const heroVideoRef = useRef(null)
   const [country, setCountry] = useState('ar')
   const [flagOpen, setFlagOpen] = useState(false)
@@ -27,14 +26,21 @@ export default function Home() {
   const [closingModal, setClosingModal] = useState(false)
   const [activeInsight, setActiveInsight] = useState(null)
   const [closingInsight, setClosingInsight] = useState(false)
+  const [submitState, setSubmitState] = useState('idle')
+  const [muteLabel, setMuteLabel] = useState('Activar sonido')
   const irContentRef = useRef(null)
 
   const lang = countries.find(c => c.code === country)?.lang ?? 'es'
   const T = translations[lang]
+
+  useEffect(() => {
+    const langMap = { es: 'es-AR', pt: 'pt-BR', en: 'en-US' }
+    document.documentElement.lang = langMap[lang] ?? lang
+  }, [lang])
   const current = countries.find(c => c.code === country)
-  const areaData = getAreaData(lang)
-  const modeloItems = getModeloItems(lang)
-  const insightCards = getInsightCards(lang)
+  const areaData = useMemo(() => getAreaData(lang), [lang])
+  const modeloItems = useMemo(() => getModeloItems(lang), [lang])
+  const insightCards = useMemo(() => getInsightCards(lang), [lang])
 
   const openModal = (area) => setActiveArea(area)
   const closeModal = () => {
@@ -165,14 +171,11 @@ export default function Home() {
   const handleMute = () => {
     if (!explainerRef.current) return
     explainerRef.current.muted = !explainerRef.current.muted
-    if (muteRef.current) {
-      muteRef.current.textContent = explainerRef.current.muted ? 'Activar sonido' : 'Silenciar'
-    }
+    setMuteLabel(explainerRef.current.muted ? 'Activar sonido' : 'Silenciar')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const btn = e.target.querySelector('.btn-submit')
     const form = e.target
     const data = {
       empresa: form.querySelector('#empresa').value,
@@ -180,21 +183,17 @@ export default function Home() {
       email:   form.querySelector('#email').value,
       mensaje: form.querySelector('#mensaje').value,
     }
-    btn.textContent = T.contacto.sending
-    btn.disabled = true
+    setSubmitState('sending')
     const res = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
     if (res.ok) {
-      btn.textContent = T.contacto.sent
-      btn.style.background = '#2a4a6b'
-      btn.style.color = '#f0ece6'
+      setSubmitState('sent')
       form.reset()
     } else {
-      btn.textContent = T.contacto.errorSend
-      btn.disabled = false
+      setSubmitState('error')
     }
   }
 
@@ -348,7 +347,7 @@ export default function Home() {
             <div className="lt-inner" key={copy} aria-hidden={copy === 1}>
               {logoList.map((logo, i) => (
                 <div className="lt-item" key={i}>
-                  <img src={logo.src} alt={logo.alt} />
+                  <img src={logo.src} alt={logo.alt} loading="lazy" height="60" />
                 </div>
               ))}
             </div>
@@ -383,9 +382,7 @@ export default function Home() {
             <video ref={explainerRef} playsInline muted controls={videoControls} preload="metadata">
               <source src="/explainer.mp4" type="video/mp4" />
             </video>
-            <button ref={muteRef} className="bv-mute" onClick={handleMute}>
-              Activar sonido
-            </button>
+            <button className="bv-mute" onClick={handleMute}>{muteLabel}</button>
           </div>
         </div>
       </section>
@@ -486,7 +483,7 @@ export default function Home() {
                 <div className="nev-logo-wrap">
                   <div className="nev-logo-card">
                     <div className="nev-logo-shine" />
-                    <img src="/nev-logo.png" alt="Negocios en Vivo" />
+                    <img src="/nev-logo.png" alt="Negocios en Vivo" loading="lazy" />
                   </div>
                   <div className="nev-logo-blur" />
                 </div>
@@ -552,7 +549,7 @@ export default function Home() {
             { src: '/logos-color/localiza.png',       alt: 'Localiza'     },
           ].map(({ src, alt }) => (
             <div className="rel-logo-item" key={alt}>
-              <img src={src} alt={alt} />
+              <img src={src} alt={alt} loading="lazy" height="44" />
             </div>
           ))}
         </div>
@@ -610,21 +607,31 @@ export default function Home() {
         <form className="contact-form reveal d2" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="empresa">{T.contacto.fEmpresa}</label>
-            <input id="empresa" type="text" placeholder={T.contacto.fEmpresaPh} autoComplete="organization" />
+            <input id="empresa" type="text" required placeholder={T.contacto.fEmpresaPh} autoComplete="organization" />
           </div>
           <div className="form-group">
             <label htmlFor="nombre">{T.contacto.fNombre}</label>
-            <input id="nombre" type="text" placeholder={T.contacto.fNombrePh} autoComplete="name" />
+            <input id="nombre" type="text" required placeholder={T.contacto.fNombrePh} autoComplete="name" />
           </div>
           <div className="form-group">
             <label htmlFor="email">{T.contacto.fEmail}</label>
-            <input id="email" type="email" placeholder={T.contacto.fEmailPh} autoComplete="email" />
+            <input id="email" type="email" required placeholder={T.contacto.fEmailPh} autoComplete="email" />
           </div>
           <div className="form-group">
             <label htmlFor="mensaje">{T.contacto.fMensaje}</label>
-            <textarea id="mensaje" placeholder={T.contacto.fMensajePh} />
+            <textarea id="mensaje" required placeholder={T.contacto.fMensajePh} />
           </div>
-          <button type="submit" className="btn-submit">{T.contacto.submit}</button>
+          <button
+            type="submit"
+            className="btn-submit"
+            disabled={submitState === 'sending' || submitState === 'sent'}
+            style={submitState === 'sent' ? { background: '#2a4a6b', color: '#f0ece6' } : undefined}
+          >
+            {submitState === 'idle'    ? T.contacto.submit    :
+             submitState === 'sending' ? T.contacto.sending   :
+             submitState === 'sent'    ? T.contacto.sent      :
+             T.contacto.errorSend}
+          </button>
         </form>
       </section>
 
