@@ -303,7 +303,7 @@ export default function Home() {
       <section className="hero" id="inicio">
         <div className="hero-video-wrap">
           <video ref={heroVideoRef} autoPlay muted loop playsInline preload="metadata">
-            <source src="https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4" type="video/mp4" />
+            <source src="/hero.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="hero-grad" />

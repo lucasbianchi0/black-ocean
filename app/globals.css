@@ -500,7 +500,7 @@ nav.scrolled {
   min-height: 700px;
   display: flex;
   align-items: flex-end;
-  padding: 0 5rem 7rem;
+  padding: 5rem 5rem 7rem;
   overflow: hidden;
 }
 
@@ -930,6 +930,13 @@ section { padding: 9rem 5rem; }
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-content { animation: none; }
+  .hero-eyebrow, .hero-title, .hero-sub, .hero-descriptor,
+  .hero-cta-wrap, .hero-scroll-indicator, .hero-areas {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+  .reveal { opacity: 1; transform: none; transition: none; }
 }
 
 /* ─── BRAND VIDEO ───────────────────────────────── */
@@ -1834,7 +1841,7 @@ footer {
   nav { padding: 1.8rem 3rem; }
   nav.scrolled { padding: 1.2rem 3rem; }
   section { padding: 7rem 3rem; }
-  .hero { padding: 0 3rem 6rem; }
+  .hero { padding: 4.5rem 3rem 6rem; }
   .hero-scroll-indicator { right: 3rem; }
   .hero-areas { right: 3rem; }
   .presentacion, .modelo, .contacto { grid-template-columns: 1fr; gap: 4rem; }
@@ -1858,7 +1865,7 @@ footer {
   .nav-center, .btn-ghost, .flag-wrap { display: none; }
   .hamburger { display: flex; }
   section { padding: 5rem 1.8rem; }
-  .hero { padding: 0 1.8rem 5rem; min-height: 100svh; align-items: flex-end; }
+  .hero { padding: 4rem 1.8rem 5rem; min-height: 100svh; align-items: flex-end; }
   .hero-scroll-indicator { display: none; }
   .hero-areas { display: none; }
   .brand-video { grid-template-columns: 1fr; min-height: auto; height: auto; }
@@ -1887,6 +1894,15 @@ footer {
   .wa-wrap { bottom: 1.6rem; right: 1.6rem; }
   .wa-float { width: 56px; height: 56px; padding: 0 1.1rem; }
   .wa-label { display: none; }
+}
+
+@media (max-width: 430px) {
+  .hero { padding: 5rem 1.5rem 3.5rem; align-items: center; justify-content: center; }
+  .hero-eyebrow { font-size: 0.6rem; margin-bottom: 1.6rem; }
+  .hero-title { font-size: clamp(3.4rem, 11vw, 4rem); margin-bottom: 1.5rem; }
+  .hero-sub { font-size: clamp(1.15rem, 4.5vw, 1.35rem); margin-bottom: 1.2rem; }
+  .hero-descriptor { font-size: 0.95rem; padding-top: 1.2rem; margin-bottom: 2rem; }
+  .hero-cta-wrap { gap: 1.4rem; }
 }
 
 /* ─── INSIGHT READER ────────────────────────────── */
