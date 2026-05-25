@@ -2,45 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { translations, getAreaData, getModeloItems, getInsightCards } from './i18n'
 
 const countries = [
   { code: 'ar', flag: '🇦🇷', label: 'ARG', lang: 'es' },
   { code: 'br', flag: '🇧🇷', label: 'BRA', lang: 'pt' },
-  { code: 'uy', flag: '🇺🇾', label: 'URU', lang: 'es' },
-  { code: 'cl', flag: '🇨🇱', label: 'CHI', lang: 'es' },
-  { code: 'py', flag: '🇵🇾', label: 'PAR', lang: 'es' },
+  { code: 'us', flag: '🇺🇸', label: 'ENG', lang: 'en' },
 ]
 
-const i18n = {
-  es: {
-    eyebrow: 'Conectar · Resolver · Expandir',
-    heroSub: 'Conexiones que generan crecimiento.',
-    heroDescStrong: 'Las empresas evolucionan. Su estructura también.',
-    heroDescBody: 'Soluciones estratégicas para compañías que requieren estructura, resolución, capacidad operativa y expansión.',
-    ctaPrimary: 'Explorar ecosistema',
-    ctaSecondary: 'Nuestra perspectiva',
-    contactoBtn: 'Contacto Institucional',
-    nav: { perspectiva: 'Perspectiva', ecosistema: 'Ecosistema', modelo: 'Modelo Operativo', relaciones: 'Relaciones', insights: 'Insights', contacto: 'Contacto' },
-    bvLabel: 'Quiénes Somos',
-    bvH1: 'El ecosistema', bvH2: 'estratégico', bvH3: 'detrás de', bvH4: 'tu empresa.',
-    bvDesc: 'Conocé cómo integramos especialistas, relaciones y estructura bajo una misma visión — para empresas que buscan operar, resolver y crecer en otro nivel.',
-    bvLink: 'Iniciar conversación',
-  },
-  pt: {
-    eyebrow: 'Conectar · Resolver · Expandir',
-    heroSub: 'Conexões que geram crescimento.',
-    heroDescStrong: 'As empresas evoluem. Sua estrutura também.',
-    heroDescBody: 'Soluções estratégicas para empresas que requerem estrutura, resolução, capacidade operacional e expansão.',
-    ctaPrimary: 'Explorar ecossistema',
-    ctaSecondary: 'Nossa perspectiva',
-    contactoBtn: 'Contato Institucional',
-    nav: { perspectiva: 'Perspectiva', ecosistema: 'Ecossistema', modelo: 'Modelo Operacional', relaciones: 'Relações', insights: 'Insights', contacto: 'Contato' },
-    bvLabel: 'Quem Somos',
-    bvH1: 'O ecossistema', bvH2: 'estratégico', bvH3: 'por trás da', bvH4: 'sua empresa.',
-    bvDesc: 'Conheça como integramos especialistas, relações e estrutura sob uma mesma visão — para empresas que buscam operar, resolver e crescer em outro nível.',
-    bvLink: 'Iniciar conversa',
-  },
-}
+const nl = (str) => str.split('\n').reduce((acc, line, i) =>
+  i === 0 ? [line] : [...acc, <br key={i}/>, line], [])
 
 export default function Home() {
   const navRef = useRef(null)
@@ -58,6 +29,13 @@ export default function Home() {
   const [closingInsight, setClosingInsight] = useState(false)
   const irContentRef = useRef(null)
 
+  const lang = countries.find(c => c.code === country)?.lang ?? 'es'
+  const T = translations[lang]
+  const current = countries.find(c => c.code === country)
+  const areaData = getAreaData(lang)
+  const modeloItems = getModeloItems(lang)
+  const insightCards = getInsightCards(lang)
+
   const openModal = (area) => setActiveArea(area)
   const closeModal = () => {
     setClosingModal(true)
@@ -74,10 +52,6 @@ export default function Home() {
     setActiveInsight(i)
     if (irContentRef.current) irContentRef.current.scrollTop = 0
   }
-
-  const lang = countries.find(c => c.code === country)?.lang ?? 'es'
-  const T = i18n[lang]
-  const current = countries.find(c => c.code === country)
 
   useEffect(() => {
     const onScroll = () => {
@@ -196,12 +170,32 @@ export default function Home() {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const btn = e.target.querySelector('.btn-submit')
-    btn.textContent = 'Mensaje enviado'
-    btn.style.background = '#2a4a6b'
-    btn.style.color = '#f0ece6'
+    const form = e.target
+    const data = {
+      empresa: form.querySelector('#empresa').value,
+      nombre:  form.querySelector('#nombre').value,
+      email:   form.querySelector('#email').value,
+      mensaje: form.querySelector('#mensaje').value,
+    }
+    btn.textContent = T.contacto.sending
+    btn.disabled = true
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    if (res.ok) {
+      btn.textContent = T.contacto.sent
+      btn.style.background = '#2a4a6b'
+      btn.style.color = '#f0ece6'
+      form.reset()
+    } else {
+      btn.textContent = T.contacto.errorSend
+      btn.disabled = false
+    }
   }
 
   return (
@@ -329,16 +323,16 @@ export default function Home() {
         </div>
         <div className="hero-areas">
           <div className="hero-area-item">
-            <span className="hero-area-label">Sede</span>
-            <span className="hero-area-value">Buenos Aires</span>
+            <span className="hero-area-label">{T.heroAreas.sede}</span>
+            <span className="hero-area-value">{T.heroAreas.sedeVal}</span>
           </div>
           <div className="hero-area-item">
-            <span className="hero-area-label">Áreas</span>
-            <span className="hero-area-value">10 sectores</span>
+            <span className="hero-area-label">{T.heroAreas.areas}</span>
+            <span className="hero-area-value">{T.heroAreas.areasVal}</span>
           </div>
           <div className="hero-area-item">
-            <span className="hero-area-label">Alcance</span>
-            <span className="hero-area-value">Regional</span>
+            <span className="hero-area-label">{T.heroAreas.alcance}</span>
+            <span className="hero-area-value">{T.heroAreas.alcanceVal}</span>
           </div>
         </div>
         <div className="hero-scroll-indicator">
@@ -365,12 +359,12 @@ export default function Home() {
       {/* PRESENTACIÓN */}
       <section className="presentacion" id="presentacion">
         <div>
-          <div className="label reveal">Presentación Institucional</div>
-          <h2 className="section-title reveal d1">Una nueva<br />generación de<br />estructuras.</h2>
+          <div className="label reveal">{T.presentacion.label}</div>
+          <h2 className="section-title reveal d1">{nl(T.presentacion.h2)}</h2>
         </div>
         <div className="presentacion-right">
-          <p className="reveal d1"><strong>OCEAN BLACK & CO.</strong> integra soluciones estratégicas para empresas y organizaciones que requieren estructura, resolución y capacidad de expansión.</p>
-          <p className="reveal d2">Más que un proveedor de servicios: un ecosistema empresarial capaz de articular especialistas, herramientas y conexiones bajo una misma visión operativa.</p>
+          <p className="reveal d1" dangerouslySetInnerHTML={{ __html: T.presentacion.p1 }} />
+          <p className="reveal d2">{T.presentacion.p2}</p>
         </div>
       </section>
 
@@ -400,11 +394,11 @@ export default function Home() {
       <section className="ecosistema" id="ecosistema">
         <div className="ecosistema-head">
           <div>
-            <div className="label reveal">Ecosistema</div>
-            <h2 className="section-title reveal d1">Áreas<br />estratégicas<br />integradas.</h2>
+            <div className="label reveal">{T.ecosistema.label}</div>
+            <h2 className="section-title reveal d1">{nl(T.ecosistema.h2)}</h2>
           </div>
           <div className="ecosistema-head-right reveal d2">
-            <p>Diez áreas integradas bajo una misma estructura. Cada una coordinada para operar de forma independiente o en conjunto, según el escenario que requiera la empresa.</p>
+            <p>{T.ecosistema.desc}</p>
           </div>
         </div>
         <div className="areas-grid">
@@ -421,7 +415,7 @@ export default function Home() {
               <div className="area-name">{area.name}</div>
               <div className="area-text">{area.text}</div>
               <div className="area-card-cta">
-                <span>Ver área</span>
+                <span>{T.ecosistema.verArea}</span>
                 <span className="area-card-arrow">→</span>
               </div>
             </div>
@@ -434,10 +428,8 @@ export default function Home() {
         <div className="marquee-track">
           {[0, 1].map(i => (
             <div className="marquee-content" key={i} aria-hidden={i === 1}>
-              {['Conectar', 'Resolver', 'Expandir', 'Ecosistema Empresarial', 'Estructura', 'Visión', 'Resolución', 'Articulación'].map((w, j) => (
-                <span key={j} className="mq-word">
-                  {w}
-                </span>
+              {T.marquee.row1.map((w, j) => (
+                <span key={j} className="mq-word">{w}</span>
               )).reduce((acc, el, idx, arr) => idx < arr.length - 1 ? [...acc, el, <span key={`dot-${idx}`} className="mq-dot" />] : [...acc, el], [])}
             </div>
           ))}
@@ -445,10 +437,8 @@ export default function Home() {
         <div className="marquee-track marquee-rev">
           {[0, 1].map(i => (
             <div className="marquee-content" key={i} aria-hidden={i === 1}>
-              {['Integración Estratégica', 'Conexiones que Generan Crecimiento', 'Desarrollo Corporativo', 'Empresas Modernas', 'Estructuras Modernas', 'Ocean Black & Co.'].map((w, j) => (
-                <span key={j} className={`mq-word${j % 2 === 0 ? ' italic' : ''}`}>
-                  {w}
-                </span>
+              {T.marquee.row2.map((w, j) => (
+                <span key={j} className={`mq-word${T.marquee.row2italic[j] ? ' italic' : ''}`}>{w}</span>
               )).reduce((acc, el, idx, arr) => idx < arr.length - 1 ? [...acc, el, <span key={`dot-${idx}`} className="mq-dot" />] : [...acc, el], [])}
             </div>
           ))}
@@ -458,11 +448,11 @@ export default function Home() {
       {/* DIFERENCIAL */}
       <section className="diferencial">
         <div className="diferencial-wrap">
-          <div className="label reveal">Diferencial</div>
-          <h2 className="section-title reveal d1">Una estructura diseñada<br />para integrar capacidades.</h2>
-          <p className="reveal d2">No prestamos servicios aislados. Desarrollamos ecosistemas capaces de resolver, integrar y acompañar procesos empresariales complejos con estructura, conexiones y capacidad de ejecución real.</p>
+          <div className="label reveal">{T.diferencial.label}</div>
+          <h2 className="section-title reveal d1">{nl(T.diferencial.h2)}</h2>
+          <p className="reveal d2">{T.diferencial.desc}</p>
           <div className="pillars">
-            {[['Resolución','Capacidad operativa'],['Integración','Ecosistema articulado'],['Conexión','Red estratégica'],['Expansión','Crecimiento sostenible']].map(([t, s], i) => (
+            {T.diferencial.pillars.map(([t, s], i) => (
               <div className={`pillar reveal${i > 0 ? ` d${i}` : ''}`} key={t}>
                 <div className="pillar-title">{t}</div>
                 <div className="pillar-sub">{s}</div>
@@ -476,7 +466,7 @@ export default function Home() {
       <div className="nev-section">
         <div className="nev-container">
           <div className="nev-card-wrap reveal">
-            <div className="nev-corner-tag">Parte del grupo</div>
+            <div className="nev-corner-tag">{T.nev.tag}</div>
           <div className="nev-card-outer">
             <div className="nev-glow" />
             <div className="nev-content">
@@ -485,11 +475,11 @@ export default function Home() {
                   <span className="nev-live-dot" />
                   <span className="nev-live-label">En Vivo</span>
                 </div>
-                <div className="nev-eyebrow reveal d1">Del ecosistema de Ocean Black &amp; Co.</div>
-                <h3 className="nev-title reveal d2">Negocios<br />en Vivo</h3>
-                <p className="nev-desc reveal d3">Tu fuente confiable de noticias económicas, financieras y empresariales para el mercado latinoamericano.</p>
+                <div className="nev-eyebrow reveal d1">{T.nev.eyebrow}</div>
+                <h3 className="nev-title reveal d2">{nl(T.nev.title)}</h3>
+                <p className="nev-desc reveal d3">{T.nev.desc}</p>
                 <a href="https://negociosenvivo.com/" target="_blank" rel="noopener noreferrer" className="nev-cta reveal d4">
-                  Conocer plataforma <span className="nev-arrow">→</span>
+                  {T.nev.cta} <span className="nev-arrow">→</span>
                 </a>
               </div>
               <div className="nev-right reveal d2">
@@ -510,9 +500,9 @@ export default function Home() {
       {/* MODELO OPERATIVO */}
       <section className="modelo" id="modelo">
         <div>
-          <div className="label reveal">Modelo Operativo</div>
-          <h2 className="section-title reveal d1">Estructura flexible.<br />Ejecución estratégica.</h2>
-          <p className="reveal d2">Operamos mediante una red de especialistas, estudios y partners coordinados centralmente. Adaptamos recursos y soluciones según cada escenario — sin estructuras fijas, sin rigidez.</p>
+          <div className="label reveal">{T.modelo.label}</div>
+          <h2 className="section-title reveal d1">{nl(T.modelo.h2)}</h2>
+          <p className="reveal d2">{T.modelo.desc}</p>
         </div>
         <div className="modelo-items">
           {modeloItems.map((item, i) => (
@@ -526,28 +516,35 @@ export default function Home() {
 
       {/* PERSPECTIVA */}
       <section className="perspectiva" id="perspectiva">
-        <div className="label reveal" style={{justifyContent:'center'}}>Nuestra Perspectiva</div>
-        <h2 className="section-title reveal d1">El valor está<br />en la articulación.</h2>
-        <p className="reveal d2">Las empresas que crecen hoy no lo hacen solas. Lo hacen con estructura, con conexiones estratégicas y con la capacidad de integrar soluciones en entornos que cambian rápido.</p>
-        <p className="reveal d3">Creemos en una nueva generación de estructuras empresariales: más conectadas, más flexibles, orientadas a generar valor real a través de relaciones y ejecución.</p>
+        <div className="label reveal" style={{justifyContent:'center'}}>{T.perspectiva.label}</div>
+        <h2 className="section-title reveal d1">{nl(T.perspectiva.h2)}</h2>
+        <p className="reveal d2">{T.perspectiva.p1}</p>
+        <p className="reveal d3">{T.perspectiva.p2}</p>
       </section>
 
       {/* RELACIONES */}
       <section className="relaciones" id="relaciones">
-        <div className="label reveal" style={{justifyContent:'center'}}>Relaciones Empresariales</div>
-        <h2 className="section-title reveal d1">Ecosistema<br />de relaciones.</h2>
-        <p className="relaciones-intro reveal d2">Empresas, profesionales y organizaciones que comparten una visión orientada al crecimiento, la evolución y la generación de valor a largo plazo.</p>
+        <div className="label reveal" style={{justifyContent:'center'}}>{T.relaciones.label}</div>
+        <h2 className="section-title reveal d1">{nl(T.relaciones.h2)}</h2>
+        <p className="relaciones-intro reveal d2">{T.relaciones.intro}</p>
         <div className="rel-logos-grid reveal d3">
           {[
-            { src: '/logos-color/agropharm.png',      alt: 'Agropharm'    },
-            { src: '/logos-color/pilloti.png',        alt: 'Pilloti'      },
+            { src: '/logos-color/gsb.png',            alt: 'GSB'          },
+            { src: '/logos-color/facyca.png',         alt: 'Facyca'       },
             { src: '/logos-color/cromed.png',         alt: 'Crosmed'      },
+            { src: '/logos-color/wallsecurity.png',   alt: 'Wall Security'},
             { src: '/logos-color/puntofarma.png',     alt: 'Punto Farma'  },
-            { src: '/logos-color/bitronics.png',      alt: 'Bitronics'    },
-            { src: '/logos-color/logo-segutrans.png', alt: 'Segutrans'    },
-            { src: '/logos-color/locsys-2.png',       alt: 'Locsys'       },
+            { src: '/logos-color/pilloti.png',        alt: 'Pilloti'      },
+            { src: '/logos-color/agropharm.png',      alt: 'Agropharm'    },
+            { src: '/logos-color/imeco.png',          alt: 'Imeco'        },
+            { src: '/logos-color/limp.png',           alt: 'Tec Limp'     },
+            { src: '/logos-color/grupo-maipu-2.png',  alt: 'Grupo Maipú'  },
             { src: '/logos-color/alfa-team-2.png',    alt: 'Alfa Team'    },
-            { src: '/logos-color/limp.png',           alt: 'Limp'         },
+            { src: '/logos-color/locsys-2.png',       alt: 'Locsys'       },
+            { src: '/logos-color/logo-segutrans.png', alt: 'Segutrans'    },
+            { src: '/logos-color/bitronics.png',      alt: 'Bitronics'    },
+            { src: '/logos-color/brinks.png',         alt: 'Brinks'       },
+            { src: '/logos-color/molinos.png',        alt: 'Molinos'      },
             { src: '/logos-color/saintcobain.png',    alt: 'Saint-Gobain' },
             { src: '/logos-color/loginter.png',       alt: 'Loginter'     },
             { src: '/logos-color/forever-pipe.png',   alt: 'Forever Pipe' },
@@ -565,10 +562,10 @@ export default function Home() {
       <section className="insights" id="insights">
         <div className="insights-top">
           <div>
-            <div className="label reveal">Insights</div>
-            <h2 className="section-title reveal d1">Perspectiva<br />empresarial.</h2>
+            <div className="label reveal">{T.insights.label}</div>
+            <h2 className="section-title reveal d1">{nl(T.insights.h2)}</h2>
           </div>
-          <button className="link-underline reveal d2" onClick={() => openInsight(0)}>Ver todos</button>
+          <button className="link-underline reveal d2" onClick={() => openInsight(0)}>{T.insights.verTodos}</button>
         </div>
         <div className="insights-grid">
           {insightCards.map((card, i) => (
@@ -583,7 +580,7 @@ export default function Home() {
               <div className="insight-cat">{card.cat}</div>
               <div className="insight-title">{card.title}</div>
               <div className="insight-text">{card.text}</div>
-              <div className="insight-arrow">Leer más</div>
+              <div className="insight-arrow">{T.insights.leerMas}</div>
             </div>
           ))}
         </div>
@@ -592,59 +589,51 @@ export default function Home() {
       {/* CONTACTO */}
       <section className="contacto" id="contacto">
         <div className="contacto-left">
-          <div className="label reveal">Contacto Institucional</div>
-          <h2 className="section-title reveal d1">Iniciar una<br />conversación.</h2>
-          <p className="reveal d2">Abiertos a construir relaciones estratégicas con empresas y organizaciones que busquen operar con mayor estructura e integración.</p>
+          <div className="label reveal">{T.contacto.label}</div>
+          <h2 className="section-title reveal d1">{nl(T.contacto.h2)}</h2>
+          <p className="reveal d2">{T.contacto.desc}</p>
           <div className="contact-details reveal d3">
             <div className="contact-row">
               <span className="contact-label">Email</span>
               <a href="mailto:contacto@oceanblack.com.ar" className="contact-value">contacto@oceanblack.com.ar</a>
             </div>
             <div className="contact-row">
-              <span className="contact-label">Javier Cicero</span>
-              <a href="mailto:javiercicero@oceanblack.com.ar" className="contact-value">javiercicero@oceanblack.com.ar</a>
-            </div>
-            <div className="contact-row">
-              <span className="contact-label">Tomás Vera</span>
-              <a href="mailto:tomasvera@oceanblack.com.ar" className="contact-value">tomasvera@oceanblack.com.ar</a>
-            </div>
-            <div className="contact-row">
-              <span className="contact-label">Instagram</span>
+              <span className="contact-label">{T.contacto.instagram}</span>
               <a href="https://instagram.com/oceanblack.co" className="contact-value" target="_blank" rel="noopener">@oceanblack.co</a>
             </div>
             <div className="contact-row">
-              <span className="contact-label">Ubicación</span>
-              <span className="contact-value">Buenos Aires &nbsp;•&nbsp; Argentina</span>
+              <span className="contact-label">{T.contacto.ubicacion}</span>
+              <span className="contact-value">{T.contacto.ubicacionVal}</span>
             </div>
           </div>
         </div>
         <form className="contact-form reveal d2" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="empresa">Empresa</label>
-            <input id="empresa" type="text" placeholder="Nombre de su organización" autoComplete="organization" />
+            <label htmlFor="empresa">{T.contacto.fEmpresa}</label>
+            <input id="empresa" type="text" placeholder={T.contacto.fEmpresaPh} autoComplete="organization" />
           </div>
           <div className="form-group">
-            <label htmlFor="nombre">Nombre</label>
-            <input id="nombre" type="text" placeholder="Su nombre completo" autoComplete="name" />
+            <label htmlFor="nombre">{T.contacto.fNombre}</label>
+            <input id="nombre" type="text" placeholder={T.contacto.fNombrePh} autoComplete="name" />
           </div>
           <div className="form-group">
-            <label htmlFor="email">Email corporativo</label>
-            <input id="email" type="email" placeholder="email@empresa.com" autoComplete="email" />
+            <label htmlFor="email">{T.contacto.fEmail}</label>
+            <input id="email" type="email" placeholder={T.contacto.fEmailPh} autoComplete="email" />
           </div>
           <div className="form-group">
-            <label htmlFor="mensaje">Mensaje</label>
-            <textarea id="mensaje" placeholder="Descripción del escenario que busca resolver..." />
+            <label htmlFor="mensaje">{T.contacto.fMensaje}</label>
+            <textarea id="mensaje" placeholder={T.contacto.fMensajePh} />
           </div>
-          <button type="submit" className="btn-submit">Iniciar Conversación</button>
+          <button type="submit" className="btn-submit">{T.contacto.submit}</button>
         </form>
       </section>
 
       {/* CIERRE */}
       <section className="cierre">
         <div className="cierre-bg-text" aria-hidden="true">OCEAN BLACK</div>
-        <h2 className="section-title reveal">Conectar.<br />Resolver.<br />Expandir.</h2>
-        <p className="cierre-sub reveal d1">Ecosistema Empresarial Estratégico</p>
-        <a href="#contacto" className="cierre-btn reveal d2">Iniciar Conversación</a>
+        <h2 className="section-title reveal">{nl(T.cierre.h2)}</h2>
+        <p className="cierre-sub reveal d1">{T.cierre.sub}</p>
+        <a href="#contacto" className="cierre-btn reveal d2">{T.cierre.btn}</a>
       </section>
 
       {/* FOOTER */}
@@ -655,41 +644,36 @@ export default function Home() {
               <Image src="/logo.jpg" alt="Ocean Black & Co." width={34} height={34} />
               <span className="nav-logo-text">Ocean Black <em>&</em> Co.</span>
             </a>
-            <p>Integración de soluciones, conexiones estratégicas y estructuras orientadas al crecimiento empresarial moderno.</p>
-            <p className="footer-location">Buenos Aires &nbsp;•&nbsp; Argentina</p>
+            <p>{T.footer.desc}</p>
+            <p className="footer-location">{T.footer.location}</p>
           </div>
           <div className="footer-col">
-            <h5>Ecosistema</h5>
+            <h5>{T.footer.ecosistemaTitle}</h5>
             <ul>
-              <li><a href="#ecosistema">Estrategia</a></li>
-              <li><a href="#ecosistema">Finanzas</a></li>
-              <li><a href="#ecosistema">Legal</a></li>
-              <li><a href="#ecosistema">Tecnología</a></li>
-              <li><a href="#ecosistema">Real Estate</a></li>
+              {T.footer.ecosistemaItems.map(([href, label]) => (
+                <li key={label}><a href={href}>{label}</a></li>
+              ))}
             </ul>
           </div>
           <div className="footer-col">
-            <h5>Empresa</h5>
+            <h5>{T.footer.empresaTitle}</h5>
             <ul>
-              <li><a href="#perspectiva">Perspectiva</a></li>
-              <li><a href="#modelo">Modelo Operativo</a></li>
-              <li><a href="#relaciones">Relaciones</a></li>
-              <li><a href="#insights">Insights</a></li>
+              {T.footer.empresaItems.map(([href, label]) => (
+                <li key={label}><a href={href}>{label}</a></li>
+              ))}
             </ul>
           </div>
           <div className="footer-col">
-            <h5>Contacto</h5>
+            <h5>{T.footer.contactoTitle}</h5>
             <ul>
               <li><a href="mailto:contacto@oceanblack.com.ar">contacto@oceanblack.com.ar</a></li>
-              <li><a href="mailto:javiercicero@oceanblack.com.ar">javiercicero@oceanblack.com.ar</a></li>
-              <li><a href="mailto:tomasvera@oceanblack.com.ar">tomasvera@oceanblack.com.ar</a></li>
               <li><a href="https://instagram.com/oceanblack.co" target="_blank" rel="noopener">Instagram</a></li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2026 Ocean Black & Co. Todos los derechos reservados.</p>
-          <p className="footer-phrase">Conectar &nbsp;•&nbsp; Resolver &nbsp;•&nbsp; Expandir</p>
+          <p>{T.footer.copyright}</p>
+          <p className="footer-phrase">{T.footer.phrase}</p>
         </div>
       </footer>
 
@@ -712,10 +696,10 @@ export default function Home() {
             </button>
             <div className="am-body">
               <div className="am-left">
-                <div className="am-num-label">Área {activeArea.num}</div>
+                <div className="am-num-label">{T.ecosistema.areaLabel} {activeArea.num}</div>
                 <h2 className="am-title">{activeArea.name}</h2>
                 <p className="am-desc">{activeArea.text}</p>
-                <div className="am-services-label">Servicios</div>
+                <div className="am-services-label">{T.ecosistema.servicios}</div>
                 <ul className="am-services">
                   {activeArea.services.map((s, i) => (
                     <li key={s} style={{ '--i': i }}>{s}</li>
@@ -727,7 +711,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="am-cta"
                 >
-                  <span>Hablemos</span>
+                  <span>{T.ecosistema.hablemos}</span>
                   <span className="am-cta-arrow">→</span>
                 </a>
               </div>
@@ -796,7 +780,7 @@ export default function Home() {
                 className="ir-nav-btn"
                 onClick={() => navInsight(activeInsight - 1)}
                 disabled={activeInsight === 0}
-              >← Anterior</button>
+              >{T.insights.anterior}</button>
               <div className="ir-dots">
                 {insightCards.map((_, i) => (
                   <span
@@ -810,7 +794,7 @@ export default function Home() {
                 className="ir-nav-btn"
                 onClick={() => navInsight(activeInsight + 1)}
                 disabled={activeInsight === insightCards.length - 1}
-              >Siguiente →</button>
+              >{T.insights.siguiente}</button>
             </div>
           </div>
         </div>
@@ -836,116 +820,18 @@ export default function Home() {
 }
 
 const logoList = [
-  { src: '/logos/facyca.png',        alt: 'Facyca'       },
-  { src: '/logos/brinks.png',        alt: 'Brinks'       },
-  { src: '/logos/saintcobain.png',   alt: 'Saint-Gobain' },
-  { src: '/logos/wallsecurity.png',  alt: 'Wall Security'},
-  { src: '/logos/pilloti.png',       alt: 'Pilloti'      },
-  { src: '/logos/grupo-maipu-2.png', alt: 'Grupo Maipú'  },
-  { src: '/logos/molinos.png',       alt: 'Molinos'      },
-  { src: '/logos/loginter.png',      alt: 'Loginter'     },
-  { src: '/logos/imeco.png',         alt: 'Imeco'        },
-  { src: '/logos/agropharm.png',     alt: 'Agropharm'    },
-]
-
-const areaData = [
-  {
-    num: '01', img: '/areas/01.jpg', name: 'Estrategia y Desarrollo Empresarial',
-    text: 'Acompañamos empresas y ejecutivos en procesos de análisis, crecimiento y estructuración estratégica.',
-    services: ['Diagnóstico empresarial','Desarrollo de estructura operativa','Estrategias de expansión','Optimización de procesos','Reorganización empresarial','Desarrollo comercial','Networking estratégico','Estructuración de alianzas','Advisory ejecutivo'],
-  },
-  {
-    num: '02', img: '/areas/02.jpg', name: 'Área Contable, Fiscal y Administrativa',
-    text: 'Articulamos soluciones contables y administrativas orientadas a mejorar la organización y eficiencia operativa.',
-    services: ['Gestión contable integral','Liquidación impositiva','Planificación fiscal','Estructuración administrativa','Optimización tributaria','Análisis financiero','Auditoría administrativa','Monotributo y autónomos','Sueldos y cargas sociales','Reportes de gestión'],
-  },
-  {
-    num: '03', img: '/areas/03.jpg', name: 'Soluciones Financieras y Corporativas',
-    text: 'Desarrollamos acceso a herramientas financieras y estructuras orientadas a facilitar el crecimiento empresarial.',
-    services: ['Gestión de líneas de crédito','Alternativas de financiamiento','Desarrollo de estructuras financieras','Capital para expansión','Soluciones corporativas estratégicas','Vehículos de optimización empresarial','Estructuración patrimonial','Evaluación de proyectos','Articulación con operadores y entidades'],
-  },
-  {
-    num: '04', img: '/areas/04.jpg', name: 'Área Jurídica y Corporativa',
-    text: 'Coordinamos soluciones legales y corporativas mediante estudios y profesionales especializados.',
-    services: ['Derecho societario','Constitución de sociedades','Contratos comerciales','Estructuración corporativa','Acuerdos empresariales','Protección patrimonial','Asesoramiento laboral','Gestión societaria','Marcas y registros','Compliance corporativo'],
-  },
-  {
-    num: '05', img: '/areas/05.jpg', name: 'Real Estate y Desarrollo Inmobiliario',
-    text: 'Acompañamos operaciones y estructuras vinculadas al desarrollo inmobiliario y patrimonial.',
-    services: ['Búsqueda de oportunidades','Inversiones inmobiliarias','Real estate corporativo','Estructuración patrimonial','Operaciones comerciales','Networking inmobiliario','Gestión de activos'],
-  },
-  {
-    num: '06', img: '/areas/06.jpg', name: 'Recursos Humanos y Desarrollo Organizacional',
-    text: 'Brindamos herramientas orientadas al fortalecimiento de equipos y estructuras internas.',
-    services: ['Reclutamiento estratégico','Búsqueda ejecutiva','Desarrollo organizacional','Estructura de equipos','Procesos internos','Capacitación empresarial','Cultura organizacional','Optimización operativa'],
-  },
-  {
-    num: '07', img: '/areas/07.jpg', name: 'Tecnología, IA y Automatización',
-    text: 'Implementamos soluciones tecnológicas orientadas a mejorar eficiencia, control y escalabilidad empresarial.',
-    services: ['Automatización de procesos','Inteligencia artificial aplicada','Integración de sistemas','CRM y gestión operativa','Asistentes virtuales empresariales','Automatización comercial','Dashboards y control','Optimización digital','Desarrollo de ecosistemas tecnológicos'],
-  },
-  {
-    num: '08', img: '/areas/08.jpg', name: 'Seguridad y Protección Empresarial',
-    text: 'Desarrollamos soluciones vinculadas a prevención, control y resguardo operativo.',
-    services: ['Seguridad corporativa','Evaluación operativa','Protocolos internos','Seguridad tecnológica','Supervisión estratégica','Control de procesos sensibles'],
-  },
-  {
-    num: '09', img: '/areas/09.jpg', name: 'Desarrollo Comercial, Marketing y Expansión',
-    text: 'Estrategias orientadas al posicionamiento, crecimiento comercial y fortalecimiento operativo de empresas y marcas.',
-    services: ['Estrategias de crecimiento','Expansión comercial','Estructuración de áreas de ventas','Posicionamiento empresarial','Branding corporativo','Comunicación institucional','Estrategias digitales','CRM y seguimiento de clientes','Automatización de procesos comerciales','Embudos y gestión comercial','Sitios web corporativos','Ecosistemas digitales'],
-  },
-  {
-    num: '10', img: '/areas/10.jpg', name: 'Formación Comercial y Desarrollo de Equipos',
-    text: 'Programas orientados al fortalecimiento comercial, profesionalización de equipos y optimización de procesos de ventas.',
-    services: ['Entrenamiento de equipos comerciales','Desarrollo de procesos de ventas','Estructuración de áreas comerciales','Capacitación en negociación y cierre','Optimización de atención y seguimiento','Formación en ventas consultivas','Integración de herramientas digitales','IA aplicada a procesos comerciales','Desarrollo de liderazgo comercial','Workshops y programas internos'],
-  },
-]
-
-const modeloItems = [
-  { title: 'Red de especialistas', text: 'Partners y profesionales integrados bajo coordinación central.' },
-  { title: 'Acceso estratégico', text: 'Conexiones que generan valor y oportunidades de desarrollo.' },
-  { title: 'Coordinación integral', text: 'Soluciones articuladas según cada nivel y escenario.' },
-  { title: 'Capacidad de resolución', text: 'Estructura preparada para operar en entornos complejos.' },
-]
-
-const insightCards = [
-  {
-    cat: 'Estrategia',
-    title: 'Estructuras flexibles para entornos en transformación',
-    text: 'Las organizaciones que se adaptan con velocidad son las que ganan. La estructura es la ventaja competitiva invisible.',
-    body: [
-      { type: 'p', text: 'Las compañías atraviesan escenarios cada vez más dinámicos, donde la capacidad de adaptación dejó de ser una ventaja secundaria para convertirse en un factor central de competitividad.' },
-      { type: 'p', text: 'En OCEAN BLACK & CO. trabajamos sobre la estructura estratégica de empresas y organizaciones que necesitan optimizar procesos, redefinir modelos operativos y fortalecer su capacidad de respuesta frente a nuevos desafíos.' },
-      { type: 'p', text: 'Nuestro enfoque combina análisis, visión empresarial y coordinación interdisciplinaria para desarrollar soluciones alineadas a las necesidades reales de cada operación.' },
-      { type: 'lead', text: 'Acompañamos procesos vinculados a:' },
-      { type: 'ul', items: ['Reorganización operativa', 'Optimización interna', 'Desarrollo comercial', 'Estructura corporativa', 'Expansión de unidades de negocio', 'Fortalecimiento estratégico'] },
-      { type: 'p', text: 'Entendemos que detrás de cada etapa de crecimiento existe una necesidad estructural distinta. La velocidad sin estructura genera desgaste. La estructura permite sostener evolución, eficiencia y escalabilidad.' },
-    ],
-  },
-  {
-    cat: 'Tecnología & IA',
-    title: 'Automatización: la nueva base de operación corporativa',
-    text: 'La inteligencia artificial aplicada ya no es una tendencia. Es el estándar de las empresas que buscan escalar.',
-    body: [
-      { type: 'p', text: 'La transformación tecnológica ya no pertenece únicamente a grandes corporaciones. Hoy, las organizaciones más competitivas son aquellas capaces de integrar automatización, inteligencia artificial y sistemas inteligentes dentro de sus operaciones cotidianas.' },
-      { type: 'p', text: 'En OCEAN BLACK & CO. impulsamos soluciones orientadas a optimizar tiempos, reducir fricción operativa y mejorar la capacidad de gestión mediante herramientas tecnológicas adaptadas a cada estructura empresarial.' },
-      { type: 'lead', text: 'Trabajamos sobre:' },
-      { type: 'ul', items: ['Automatización de procesos', 'Integración de sistemas', 'Inteligencia artificial aplicada', 'Optimización administrativa', 'Desarrollo de herramientas digitales', 'Modernización operativa'] },
-      { type: 'quote', text: 'La tecnología no reemplaza estructuras. Las potencia.' },
-      { type: 'p', text: 'La incorporación estratégica de automatización permite a las empresas operar con mayor precisión, velocidad y capacidad de expansión, liberando tiempo y recursos para enfocarse en decisiones de alto valor.' },
-    ],
-  },
-  {
-    cat: 'Expansión',
-    title: 'El capital estratégico detrás del crecimiento sostenible',
-    text: 'Crecer requiere más que financiamiento. Requiere acceso, conexiones y una estructura que soporte la expansión.',
-    body: [
-      { type: 'p', text: 'Expandirse implica mucho más que aumentar volumen o incorporar recursos. El crecimiento sostenible requiere estructura, visión, acceso estratégico y capacidad de ejecución.' },
-      { type: 'p', text: 'En OCEAN BLACK & CO. acompañamos empresas y organizaciones que buscan fortalecer sus procesos de expansión mediante conexiones, herramientas y soluciones alineadas a objetivos concretos de desarrollo.' },
-      { type: 'lead', text: 'Nuestro ecosistema integra distintas áreas para facilitar:' },
-      { type: 'ul', items: ['Crecimiento comercial', 'Desarrollo corporativo', 'Generación de alianzas', 'Acceso a nuevas oportunidades', 'Optimización de estructura', 'Acompañamiento en procesos de escalabilidad'] },
-      { type: 'p', text: 'Creemos que las empresas crecen de forma más sólida cuando cuentan con una estructura preparada para sostener esa evolución.' },
-      { type: 'quote', text: 'El verdadero crecimiento no depende únicamente del capital disponible, sino de la capacidad de transformar oportunidades en expansión real.' },
-    ],
-  },
+  { src: '/logos/gsb.png',             alt: 'GSB'             },
+  { src: '/logos/facyca.png',          alt: 'Facyca'          },
+  { src: '/logos/cromed.png',          alt: 'Crosmed'         },
+  { src: '/logos/wallsecurity.png',    alt: 'Wall Security'   },
+  { src: '/logos/puntofarma.png',      alt: 'Punto Farma'     },
+  { src: '/logos/pilloti.png',         alt: 'Pilloti'         },
+  { src: '/logos/agropharm.png',       alt: 'Agropharm'       },
+  { src: '/logos/imeco.png',           alt: 'Imeco'           },
+  { src: '/logos/limp.png',            alt: 'Tec Limp'        },
+  { src: '/logos/grupo-maipu-2.png',   alt: 'Grupo Maipú'     },
+  { src: '/logos/alfa-team-2.png',     alt: 'Alfa Team'       },
+  { src: '/logos/locsys-2.png',        alt: 'Locsys Seguridad'},
+  { src: '/logos/logo-segutrans.png',  alt: 'Segutrans'       },
+  { src: '/logos/bitronics.png',       alt: 'Bitronics'       },
 ]

@@ -455,7 +455,7 @@ nav.scrolled {
 .lt-track {
   display: flex;
   width: max-content;
-  animation: ltScroll 42s linear infinite;
+  animation: ltScroll 55s linear infinite;
 }
 
 .lt-inner {
