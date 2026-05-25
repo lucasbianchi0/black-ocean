@@ -64,7 +64,7 @@ export async function POST(request) {
 
   const { error } = await resend.emails.send({
     from: 'onboarding@resend.dev',
-    to: 'lucmbianchi2000@gmail.com',
+    to: 'contacto@oceanblack.com.ar',
     subject: `Nueva consulta de ${n} — ${e}`,
     html: `<!DOCTYPE html>
 <html lang="es">
